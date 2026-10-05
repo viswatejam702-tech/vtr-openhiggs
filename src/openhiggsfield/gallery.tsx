@@ -20,6 +20,7 @@ import {
 } from "./icons";
 import { timeAgo, type RunRecord } from "./history";
 import { ModelIcon } from "./model-icon";
+import { BorderBeam, ThinkingOrb, ImageGeneration } from "./effects";
 
 const EMPTY: Record<GalleryView, { title: string; hint: string }> = {
   image: {
@@ -223,6 +224,16 @@ const Tile = memo(function Tile({
             playsInline
             preload="metadata"
           />
+        ) : fresh ? (
+          <ImageGeneration
+            preset="pixels-organic"
+            images={[poster]}
+            autoReveal
+            className="ohf-tile-media"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="ohf-tile-media" src={poster} alt={item.prompt} loading="lazy" />
+          </ImageGeneration>
         ) : (
           /* Platform-hosted result on an arbitrary CDN host; next/image would
              need every provider domain allow-listed up front. */
@@ -556,16 +567,28 @@ function RunningTile({ run }: { run: ActiveRun }) {
   }, [run.startedAt]);
 
   return (
-    <div
-      className="ohf-skeleton"
-      role="status"
-      aria-label={`${run.modelLabel} rendering`}
-    >
-      <span className="ohf-skeleton-label">Rendering</span>
-      <span className="ohf-skeleton-clock">
-        {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
-      </span>
-    </div>
+    <BorderBeam size="md" colorVariant="ocean" strength={0.85} active={true} theme="dark">
+      <div
+        className="ohf-skeleton"
+        role="status"
+        aria-label={`${run.modelLabel} rendering`}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "14px",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <ThinkingOrb state="weaving" size={64} dark={true} />
+        <span className="ohf-skeleton-label">{run.modelLabel}</span>
+        <span className="ohf-skeleton-clock">
+          {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
+        </span>
+      </div>
+    </BorderBeam>
   );
 }
 

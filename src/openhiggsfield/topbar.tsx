@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { VIEWS, VIEW_LABELS, type GalleryView } from "./data";
 import { AssetsIcon, HeartIcon, ImageIcon, KeyIcon, VideoIcon } from "./icons";
+import { BorderBeam, MetalBadge, MetalText } from "./effects";
 
 const VIEW_ICONS: Record<GalleryView, () => React.ReactNode> = {
   image: () => <ImageIcon />,
@@ -74,6 +75,14 @@ export function Topbar({
     <div className="ohf-topbar">
       <h1 className="ohf-sr">VTR Higgs — AI Studio</h1>
 
+      {/* Brand & Edition */}
+      <div className="ohf-bar ohf-enter-1" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 12px" }}>
+        <MetalText font="700 12px Inter" color="#d1fe17">
+          VTR HIGGS
+        </MetalText>
+        <MetalBadge>AI STUDIO</MetalBadge>
+      </div>
+
       <div className="ohf-bar ohf-enter-1">
         <div
           className="ohf-tabs"
@@ -106,8 +115,6 @@ export function Topbar({
                 tabIndex={selected ? 0 : -1}
                 className="ohf-tab"
                 data-view={id}
-                /* Favorites is the one scope that goes icon-only on a narrow
-                   pill, so its name is stated rather than left to the mark. */
                 aria-label={VIEW_LABELS[id]}
                 title={id === "favorites" ? VIEW_LABELS[id] : undefined}
                 onClick={() => onView(id)}
@@ -120,23 +127,23 @@ export function Topbar({
         </div>
       </div>
 
-      {/* Generations run on the visitor's own platform key, so this both states
-          whether one is held and opens the modal that sets it — and its lamp is
-          the studio's liveness, the one place accent moves. */}
+      {/* Key & Provider Status */}
       <div className="ohf-bar ohf-enter-1">
-        <button
-          type="button"
-          className="ohf-key"
-          data-busy={busy}
-          data-ready={keyConfigured}
-          onClick={onKeys}
-          aria-label={keyConfigured ? "Edit platform key" : "Add platform key"}
-          title={keyConfigured ? "Edit platform key" : "Add platform key"}
-        >
-          <KeyIcon />
-          <span className="ohf-key-text">{keyConfigured ? "Your key" : "Add key"}</span>
-          <span className="ohf-lamp" />
-        </button>
+        <BorderBeam size="sm" colorVariant="ocean" strength={0.7} active={keyConfigured}>
+          <button
+            type="button"
+            className="ohf-key"
+            data-busy={busy}
+            data-ready={keyConfigured}
+            onClick={onKeys}
+            aria-label={keyConfigured ? "Edit platform key" : "Add platform key"}
+            title={keyConfigured ? "Edit platform key" : "Add platform key"}
+          >
+            <KeyIcon />
+            <span className="ohf-key-text">{keyConfigured ? "Your key" : "Add key"}</span>
+            <span className="ohf-lamp" />
+          </button>
+        </BorderBeam>
       </div>
     </div>
   );

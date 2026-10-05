@@ -18,6 +18,7 @@ import { MediaStrip, useMediaTray } from "./media-tray";
 import { ModelIcon, modelIconSrc } from "./model-icon";
 import { ModelPicker } from "./model-picker";
 import { SettingPill, SettingPopover } from "./settings";
+import { BorderBeam, MetalFx, ThinkingOrb } from "./effects";
 
 /* Overlay ids: the two fixed panels, or one setting addressed by its catalog
    key — the rail renders whatever the model declares, so the ids cannot be a
@@ -275,8 +276,9 @@ export function Composer({
             aligned to the same bottom edge, so the dock never changes height
             and the toolbar rises exactly where the composer's rail was. */}
         <div className="ohf-swap">
-          <div className="ohf-composer">
-            <MediaStrip model={model} />
+          <BorderBeam size="md" colorVariant="colorful" strength={0.7} active={!disabled || generating}>
+            <div className="ohf-composer">
+              <MediaStrip model={model} />
 
             {/* The attachment sits beside the words it belongs to, on the same
                 left rail the control row starts from. */}
@@ -363,27 +365,33 @@ export function Composer({
               </div>
 
               <span className="ohf-generate-slot ohf-tip ohf-tip--end" data-tip={generateTip}>
-                <button
-                  type="button"
-                  className="ohf-generate"
-                  disabled={disabled}
-                  data-busy={generating}
-                  aria-label={generateLabel}
-                  onClick={onGenerate}
-                >
-                  {/* The sheen is the only thing a run in flight changes here:
-                      the label still names what pressing does, because pressing
-                      is still allowed. Progress is the grid's to report. */}
-                  {generating && <span className="ohf-generate-sheen" aria-hidden />}
-                  <span className="ohf-generate-glyph" aria-hidden>
-                    <ArrowUpIcon size={15} />
-                  </span>
-                  <span className="ohf-generate-label">Generate</span>
-                  {shortcut && <kbd className="ohf-kbd">{shortcut}</kbd>}
-                </button>
+                <MetalFx preset="chromatic" variant="button" strength={1}>
+                  <button
+                    type="button"
+                    className="ohf-generate"
+                    disabled={disabled}
+                    data-busy={generating}
+                    aria-label={generateLabel}
+                    onClick={onGenerate}
+                  >
+                    {generating && <span className="ohf-generate-sheen" aria-hidden />}
+                    <span className="ohf-generate-glyph" aria-hidden>
+                      {generating ? (
+                        <ThinkingOrb state="weaving" size={20} dark={true} />
+                      ) : (
+                        <ArrowUpIcon size={15} />
+                      )}
+                    </span>
+                    <span className="ohf-generate-label">
+                      {generating ? "Thinking…" : "Generate"}
+                    </span>
+                    {shortcut && !generating && <kbd className="ohf-kbd">{shortcut}</kbd>}
+                  </button>
+                </MetalFx>
               </span>
             </div>
           </div>
+        </BorderBeam>
 
           {selection}
         </div>

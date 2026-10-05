@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { clearPlatformCredentials, savePlatformCredentials } from "@/generation/actions";
 
 import { CloseIcon } from "./icons";
+import { BorderBeam, MetalFx } from "./effects";
 
 export function KeyModal({
   configured,
@@ -91,35 +92,39 @@ export function KeyModal({
             <p style={{ margin: "0 0 10px 0", fontSize: "12px", color: "#ccc", lineHeight: "1.4" }}>
               Generate real live videos and images powered by Flux &amp; AI video engines for free without requiring a paid subscription.
             </p>
-            <button
-              type="button"
-              disabled={busy}
-              style={{
-                width: "100%",
-                padding: "8px 12px",
-                background: "#d1fe17",
-                color: "#0a0a0b",
-                fontWeight: 700,
-                fontSize: "12px",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-              onClick={async () => {
-                setBusy(true);
-                setError(null);
-                try {
-                  await savePlatformCredentials({ api_key: "free:free" });
-                  onSaved();
-                } catch (caught) {
-                  setError(caught instanceof Error ? caught.message : "Could not activate free mode");
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              {busy ? "Activating…" : "✨ Activate Free Mode Now"}
-            </button>
+            <BorderBeam size="sm" colorVariant="sunset" strength={0.7} active={true}>
+              <MetalFx preset="gold" variant="button" strength={1}>
+                <button
+                  type="button"
+                  disabled={busy}
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    background: "#d1fe17",
+                    color: "#0a0a0b",
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                  }}
+                  onClick={async () => {
+                    setBusy(true);
+                    setError(null);
+                    try {
+                      await savePlatformCredentials({ api_key: "free:free" });
+                      onSaved();
+                    } catch (caught) {
+                      setError(caught instanceof Error ? caught.message : "Could not activate free mode");
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  {busy ? "Activating…" : "✨ Activate Free Mode Now"}
+                </button>
+              </MetalFx>
+            </BorderBeam>
           </div>
 
           <label className="ohf-field">
