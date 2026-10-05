@@ -1,6 +1,15 @@
 {
-  "name": "openhiggsfield-ai",
-  "private": true,
+  "name": "vtr-higgs",
+  "version": "1.0.0",
+  "description": "VTR Higgs — Professional AI Studio for Image and Video Generation",
+  "author": "VTR <viswatejam45@gmail.com>",
+  "contributors": [
+    {
+      "name": "VTR",
+      "url": "https://github.com/mviswatejareddy"
+    }
+  ],
+  "private": false,
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",

@@ -1,24 +1,20 @@
-# OpenHiggsfield AI — Open-Source Alternative to Higgsfield AI
+# VTR Higgs — Next-Gen AI Generation Studio
 
-> **The free, open-source alternative to Higgsfield AI.** Generate images and
-> videos with 38 models from one prompt bar — no closed ecosystem, no studio
-> subscription.
+> **The high-performance, open AI studio by VTR.** Generate images and videos with 38+ models from one prompt bar — featuring native 100% Free Generation Mode, zero vendor lock-in, and professional aerospace dark UI.
 
-## 🌐 Try it Online — No Install Required
-
-**Hosted version:** [openhiggsfield.ai](https://openhiggsfield.ai)
-
-Image and Video in one studio, in the browser — no Node.js, no setup. Add your
-platform key (`id:secret`) to start generating. The studio itself is free.
+## 👥 Contributors & Maintained By
+- **VTR** ([@mviswatejareddy](https://github.com/mviswatejareddy)) — Project Lead & Contributor
+- Core Architecture: Next.js 16 App Router · React 19 · Zustand · Custom Dark Glass Theme
 
 ---
 
-**Why OpenHiggsfield AI instead of Higgsfield AI?**
+**Why VTR Higgs?**
 
-- **Free & open-source** — no studio subscription, no vendor lock-in
-- **Self-hosted** — clone it, run it, change it
-- **Your key** — generate with your own platform key
-- **38 models** — 8 image, 30 video, one catalog, one composer
+- **⚡ 100% Free Mode Included** — Generate unlimited AI images (Flux / SDXL) without paid subscriptions or keys
+- **38+ Models Supported** — Soul 2, Soul Cinema, Seedance 2.5, Kling 3, Wan, Flux, Ideogram, Recraft, LTX, MiniMax, PixVerse
+- **Self-Hosted & Private** — Clone it, run it locally, keep your history in your browser
+- **Multi-Platform Auth** — Compatible with Free Mode, OpenRouter, Hugging Face, or Higgsfield API keys
+
 
 ---
 

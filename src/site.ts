@@ -15,12 +15,13 @@ function resolveOrigin(): string {
 
 export const SITE_URL = resolveOrigin();
 
-export const SITE_NAME = "OpenHiggsfield AI";
-export const SITE_DESCRIPTOR = "Open source AI studio";
+export const SITE_NAME = "VTR Higgs";
+export const SITE_DESCRIPTOR = "VTR Next-Gen AI Studio";
 export const SITE_TITLE = `${SITE_NAME} — ${SITE_DESCRIPTOR}`;
 
 export const SITE_DESCRIPTION =
-  "A studio for image and video generation — one prompt bar, each model’s own settings, and every finished run in one gallery.";
+  "A high-performance studio for image and video generation powered by VTR AI — 38+ models, unlimited free mode, and instant gallery.";
+
 
 /** Near-black studio ground; also the installed-app and browser-chrome color. */
 export const STUDIO_BG = "#0a0a0b";

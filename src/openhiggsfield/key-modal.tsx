@@ -83,18 +83,65 @@ export function KeyModal({
         </div>
 
         <form className="ohf-keys-form" onSubmit={(event) => void onSubmit(event)}>
+          <div style={{ marginBottom: "16px", padding: "12px", background: "rgba(209, 254, 23, 0.08)", border: "1px solid rgba(209, 254, 23, 0.25)", borderRadius: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+              <span style={{ color: "#d1fe17", fontWeight: 600, fontSize: "13px" }}>⚡ Free Generation Mode</span>
+              <span style={{ fontSize: "11px", color: "#888" }}>Zero cost · No key required</span>
+            </div>
+            <p style={{ margin: "0 0 10px 0", fontSize: "12px", color: "#ccc", lineHeight: "1.4" }}>
+              Generate images and art for free powered by Flux &amp; open-source AI models without an active subscription.
+            </p>
+            <button
+              type="button"
+              disabled={busy}
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                background: "#d1fe17",
+                color: "#0a0a0b",
+                fontWeight: 700,
+                fontSize: "12px",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+              onClick={async () => {
+                setBusy(true);
+                setError(null);
+                try {
+                  await savePlatformCredentials({ api_key: "free:free" });
+                  onSaved();
+                } catch (caught) {
+                  setError(caught instanceof Error ? caught.message : "Could not activate free mode");
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {busy ? "Activating…" : "✨ Activate Free Mode Now"}
+            </button>
+          </div>
+
           <label className="ohf-field">
-            <div className="ohf-field-label">API key</div>
+            <div className="ohf-field-label">Custom Platform Key (Optional)</div>
             <input
               className="ohf-input ohf-input--mono"
               name="api_key"
               type="password"
+              placeholder="Paste id:secret or free key"
               autoComplete="off"
               spellCheck={false}
               value={apiKey}
               onChange={(event) => setApiKey(event.target.value)}
             />
           </label>
+
+          <div style={{ margin: "12px 0 16px 0", fontSize: "11px", color: "#888", lineHeight: "1.6" }}>
+            <div style={{ fontWeight: 600, color: "#aaa", marginBottom: "4px" }}>Get free keys &amp; trial credits:</div>
+            • <a href="https://open.higgsfield.ai" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Higgsfield Starter Key</a> (Free signup credits)<br />
+            • <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>OpenRouter Free Keys</a> (Free AI model tier)<br />
+            • <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Hugging Face Tokens</a> (Free inference tokens)
+          </div>
 
           {error && (
             <div className="ohf-alert" role="alert">

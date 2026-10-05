@@ -137,9 +137,15 @@ function mapByPaths(plane: GenerationPlane, spec: PlatformPaths): Mapped {
       body: refs.length ? { ...body, image_urls: refs } : body,
     };
   }
-  if (spec.image) return { path: spec.image, body };
+  if (spec.image) {
+    if (!start) throw new Error(`Model "${plane.model}" requires a start frame image. Attach an image in the composer or switch to a text-to-video model like Kling or Seedance.`);
+    return { path: spec.image, body };
+  }
+  if (spec.firstLast) {
+    if (!start && !end) throw new Error(`Model "${plane.model}" requires start or end frames. Attach an image or switch to a text-to-video model.`);
+    return { path: spec.firstLast, body };
+  }
   if (spec.reference) return { path: spec.reference, body };
-  if (spec.firstLast) return { path: spec.firstLast, body };
   throw new Error("Model has no platform path");
 }
 

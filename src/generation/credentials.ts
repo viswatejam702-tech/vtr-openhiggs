@@ -47,9 +47,22 @@ export function toAuthorizationHeader(apiKey: string): string {
 }
 
 function requireIdAndSecret(apiKey: string): string {
-  const colon = apiKey.indexOf(":");
-  if (colon <= 0 || colon === apiKey.length - 1) {
-    throw new Error("API key must be id:secret");
+  const trimmed = apiKey.trim();
+  if (
+    trimmed.toLowerCase() === "free" ||
+    trimmed.toLowerCase() === "free:free" ||
+    trimmed.toLowerCase() === "free_tier" ||
+    trimmed.toLowerCase() === "demo" ||
+    trimmed.toLowerCase() === "demo:demo" ||
+    trimmed.toLowerCase().startsWith("openrouter") ||
+    trimmed.toLowerCase().startsWith("sk-or-")
+  ) {
+    return trimmed.includes(":") ? trimmed : `${trimmed}:${trimmed}`;
   }
-  return apiKey;
+  const colon = trimmed.indexOf(":");
+  if (colon <= 0 || colon === trimmed.length - 1) {
+    throw new Error("API key must be id:secret (or use 'free:free' for Free Mode)");
+  }
+  return trimmed;
 }
+
