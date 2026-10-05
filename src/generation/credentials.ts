@@ -43,25 +43,33 @@ export function parseCredentialInput(data: unknown): { apiKey: string } {
 }
 
 export function toAuthorizationHeader(apiKey: string): string {
+  const trimmed = apiKey.trim();
+  if (trimmed.startsWith("sk-or-") || trimmed.toLowerCase().startsWith("openrouter") || trimmed.startsWith("hf_")) {
+    return `Bearer ${trimmed}`;
+  }
   return `Key ${requireIdAndSecret(apiKey)}`;
 }
 
 function requireIdAndSecret(apiKey: string): string {
   const trimmed = apiKey.trim();
+  const lower = trimmed.toLowerCase();
   if (
-    trimmed.toLowerCase() === "free" ||
-    trimmed.toLowerCase() === "free:free" ||
-    trimmed.toLowerCase() === "free_tier" ||
-    trimmed.toLowerCase() === "demo" ||
-    trimmed.toLowerCase() === "demo:demo" ||
-    trimmed.toLowerCase().startsWith("openrouter") ||
-    trimmed.toLowerCase().startsWith("sk-or-")
+    lower === "free" ||
+    lower === "free:free" ||
+    lower === "free_tier" ||
+    lower === "demo" ||
+    lower === "demo:demo" ||
+    lower.startsWith("free")
   ) {
-    return trimmed.includes(":") ? trimmed : `${trimmed}:${trimmed}`;
+    return "free:free";
+  }
+  if (trimmed.startsWith("sk-or-") || lower.startsWith("openrouter") || trimmed.startsWith("hf_")) {
+    return trimmed;
   }
   const colon = trimmed.indexOf(":");
   if (colon <= 0 || colon === trimmed.length - 1) {
-    throw new Error("API key must be id:secret (or use 'free:free' for Free Mode)");
+    // If not colon formatted, return trimmed directly instead of throwing
+    return trimmed;
   }
   return trimmed;
 }

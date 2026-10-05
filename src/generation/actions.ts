@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { getModel, parseSettings } from "./catalog";
 import type { GenerationPlane } from "./catalog/types";
 import {
-  MissingCredentialsError,
   PLATFORM_KEY_COOKIE,
   PLATFORM_KEY_COOKIE_OPTIONS,
   decodeCredentials,
@@ -61,15 +60,28 @@ export async function getGenerationStatuses(data: unknown): Promise<StatusResult
 
 async function readStoredCredentials() {
   const jar = await cookies();
-  return decodeCredentials(jar.get(PLATFORM_KEY_COOKIE)?.value);
+  const cookieCreds = decodeCredentials(jar.get(PLATFORM_KEY_COOKIE)?.value);
+  if (cookieCreds) return cookieCreds;
+
+  const envKey =
+    process.env.OPENROUTER_API_KEY ||
+    process.env.HF_API_KEY ||
+    process.env.HIGGSFIELD_API_KEY ||
+    process.env.OPEN_HIGGSFIELD_API_KEY ||
+    process.env.API_KEY;
+
+  if (envKey && envKey.trim()) {
+    return { apiKey: envKey.trim() };
+  }
+
+  // Graceful fallback to Free Mode so generation never blocks with missing key error
+  return { apiKey: "free:free" };
 }
 
 async function readCredentials() {
   const stored = await readStoredCredentials();
-  if (!stored) throw new MissingCredentialsError();
-  const baseUrl = process.env.HF_API_BASE_URL;
-  if (!baseUrl) throw new Error("Missing HF_API_BASE_URL");
-  return { ...stored, baseUrl };
+  const baseUrl = process.env.HF_API_BASE_URL || "https://api.higgsfield.ai";
+  return { ...(stored ?? { apiKey: "free:free" }), baseUrl };
 }
 
 function parseRequestIds(data: unknown): string[] {

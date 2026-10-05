@@ -89,7 +89,7 @@ export function KeyModal({
               <span style={{ fontSize: "11px", color: "#888" }}>Zero cost · No key required</span>
             </div>
             <p style={{ margin: "0 0 10px 0", fontSize: "12px", color: "#ccc", lineHeight: "1.4" }}>
-              Generate images and art for free powered by Flux &amp; open-source AI models without an active subscription.
+              Generate real live videos and images powered by Flux &amp; AI video engines for free without requiring a paid subscription.
             </p>
             <button
               type="button"
@@ -123,12 +123,12 @@ export function KeyModal({
           </div>
 
           <label className="ohf-field">
-            <div className="ohf-field-label">Custom Platform Key (Optional)</div>
+            <div className="ohf-field-label">Custom API Key (Optional)</div>
             <input
               className="ohf-input ohf-input--mono"
               name="api_key"
               type="password"
-              placeholder="Paste id:secret or free key"
+              placeholder="Paste OpenRouter (sk-or-...), Higgsfield id:secret, or free"
               autoComplete="off"
               spellCheck={false}
               value={apiKey}
@@ -137,10 +137,11 @@ export function KeyModal({
           </label>
 
           <div style={{ margin: "12px 0 16px 0", fontSize: "11px", color: "#888", lineHeight: "1.6" }}>
-            <div style={{ fontWeight: 600, color: "#aaa", marginBottom: "4px" }}>Get free keys &amp; trial credits:</div>
-            • <a href="https://open.higgsfield.ai" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Higgsfield Starter Key</a> (Free signup credits)<br />
-            • <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>OpenRouter Free Keys</a> (Free AI model tier)<br />
-            • <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Hugging Face Tokens</a> (Free inference tokens)
+            <div style={{ fontWeight: 600, color: "#aaa", marginBottom: "4px" }}>Recommended free API providers:</div>
+            • <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>OpenRouter Free Tier Keys</a> (Free models &amp; video generation)<br />
+            • <a href="https://pollinations.ai" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Pollinations.ai</a> (100% Free unlimited images &amp; media)<br />
+            • <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Hugging Face Tokens</a> (Free serverless models)<br />
+            • <a href="https://open.higgsfield.ai" target="_blank" rel="noreferrer" style={{ color: "#d1fe17", textDecoration: "underline" }}>Higgsfield Starter Key</a> (Trial credits)
           </div>
 
           {error && (

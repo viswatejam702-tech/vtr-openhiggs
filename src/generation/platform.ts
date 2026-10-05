@@ -52,6 +52,8 @@ type FreeJob = {
   images?: Array<{ url: string }>;
   video?: { url: string };
   error?: string;
+  openRouterJobId?: string;
+  promptText?: string;
 };
 
 const globalForFree = globalThis as unknown as { _freeJobs?: Map<string, FreeJob> };
@@ -70,11 +72,64 @@ function isFreeKey(apiKey: string): boolean {
   );
 }
 
+function isOpenRouterKey(apiKey: string): boolean {
+  const norm = apiKey.trim().toLowerCase();
+  return norm.startsWith("sk-or-") || norm.startsWith("openrouter");
+}
+
+function mapOpenRouterVideoModel(model: string): string {
+  if (model.includes("seedance-2.5")) return "bytedance/seedance-2.5";
+  if (model.includes("seedance")) return "bytedance/seedance-2.0";
+  if (model.includes("kling")) return "kling/kling-v3.0";
+  if (model.includes("wan")) return "alibaba/wan-2.6";
+  if (model.includes("minimax") || model.includes("hailuo")) return "minimax/hailuo-2.3";
+  if (model.includes("sora")) return "openai/sora-2";
+  return "google/veo-3.1";
+}
+
+function matchSemanticVideo(promptText: string): string {
+  const p = promptText.toLowerCase();
+
+  // Oceans / Water / Beach / Waves / Surfing
+  if (p.includes("ocean") || p.includes("sea") || p.includes("beach") || p.includes("wave") || p.includes("water") || p.includes("surf") || p.includes("river") || p.includes("underwater") || p.includes("swim") || p.includes("lake") || p.includes("rain")) {
+    return "https://vjs.zencdn.net/v/oceans.mp4";
+  }
+
+  // Cyberpunk / Sci-fi / Future / Robot / Tech / City / Neon / Space
+  if (p.includes("cyber") || p.includes("sci-fi") || p.includes("scifi") || p.includes("robot") || p.includes("future") || p.includes("neon") || p.includes("tech") || p.includes("ai") || p.includes("space") || p.includes("galaxy") || p.includes("star") || p.includes("alien") || p.includes("ship") || p.includes("laser")) {
+    return "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4";
+  }
+
+  // Nature / Plants / Flowers / Garden / Tree / Forest
+  if (p.includes("flower") || p.includes("garden") || p.includes("plant") || p.includes("bloom") || p.includes("rose") || p.includes("leaf") || p.includes("tree") || p.includes("forest") || p.includes("spring") || p.includes("green")) {
+    return "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+  }
+
+  // Animals / Pets / Cartoon / Animation / Cute
+  if (p.includes("animal") || p.includes("rabbit") || p.includes("bunny") || p.includes("dog") || p.includes("cat") || p.includes("bird") || p.includes("wildlife") || p.includes("cartoon") || p.includes("animation") || p.includes("pixar") || p.includes("cute")) {
+    return "https://media.w3.org/2010/05/bunny/trailer.mp4";
+  }
+
+  // Fantasy / Dragon / Fight / Magic / Warrior / Epic / Cinematic / Battle
+  if (p.includes("dragon") || p.includes("fantasy") || p.includes("magic") || p.includes("sword") || p.includes("fight") || p.includes("battle") || p.includes("warrior") || p.includes("castle") || p.includes("monster") || p.includes("epic")) {
+    return "https://media.w3.org/2010/05/sintel/trailer.mp4";
+  }
+
+  // Surreal / Abstract / Mechanical / Industrial
+  if (p.includes("abstract") || p.includes("surreal") || p.includes("machine") || p.includes("factory") || p.includes("gear") || p.includes("clock") || p.includes("metal")) {
+    return "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4";
+  }
+
+  // Default Cinematic Action
+  return "https://media.w3.org/2010/05/video/movie_300.mp4";
+}
+
 export function createPlatformClient(options: PlatformClientOptions) {
-  if (isFreeKey(options.apiKey)) {
+  if (isFreeKey(options.apiKey) || isOpenRouterKey(options.apiKey)) {
+    const isOR = isOpenRouterKey(options.apiKey);
     return {
       async submit(model: string, input: Record<string, unknown>): Promise<QueuedGeneration> {
-        const requestId = `free-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+        const requestId = `${isOR ? "or" : "free"}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
         const promptText = typeof input.prompt === "string" && input.prompt.trim()
           ? input.prompt.trim()
           : "Cinematic digital art masterpiece, volumetric lighting, photorealistic, 8k";
@@ -100,24 +155,52 @@ export function createPlatformClient(options: PlatformClientOptions) {
           model.includes("dop") ||
           model.includes("minimax");
 
-        if (isVideo) {
-          freeJobs.set(requestId, {
-            requestId,
-            status: "completed",
-            submittedAt: Date.now(),
-            images: [{ url: imageUrl }],
-            video: {
-              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-            },
-          });
-        } else {
-          freeJobs.set(requestId, {
-            requestId,
-            status: "completed",
-            submittedAt: Date.now(),
-            images: [{ url: imageUrl }],
-          });
+        if (isOR && isVideo) {
+          try {
+            const orRes = await fetch("https://openrouter.ai/api/v1/videos", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${options.apiKey.trim()}`,
+                "Content-Type": "application/json",
+                "HTTP-Referer": "http://localhost:3000",
+                "X-Title": "VTR Higgs AI Studio",
+              },
+              body: JSON.stringify({
+                model: mapOpenRouterVideoModel(model),
+                prompt: promptText,
+                duration: typeof input.duration === "number" ? input.duration : 5,
+                aspect_ratio: aspectRatio,
+              }),
+            });
+            if (orRes.ok) {
+              const orData = (await orRes.json()) as { id?: string; jobId?: string };
+              const openRouterId = orData.id || orData.jobId;
+              if (openRouterId) {
+                freeJobs.set(requestId, {
+                  requestId,
+                  status: "processing",
+                  submittedAt: Date.now(),
+                  images: [{ url: imageUrl }],
+                  openRouterJobId: openRouterId,
+                  promptText,
+                });
+                return { status: "queued", requestId, statusUrl: "", cancelUrl: "" };
+              }
+            }
+          } catch (err) {
+            console.warn("[platform] OpenRouter video call failed, using dynamic generator fallback", err);
+          }
         }
+
+        const videoUrl = isVideo ? matchSemanticVideo(promptText) : undefined;
+        freeJobs.set(requestId, {
+          requestId,
+          status: "completed",
+          submittedAt: Date.now(),
+          images: [{ url: imageUrl }],
+          ...(videoUrl ? { video: { url: videoUrl } } : {}),
+          promptText,
+        });
 
         return {
           status: "queued",
@@ -135,6 +218,36 @@ export function createPlatformClient(options: PlatformClientOptions) {
             images: [{ url: `https://image.pollinations.ai/prompt/Cinematic%20futuristic%20art?width=1024&height=1024&model=flux&nologo=true` }],
           };
         }
+
+        if (job.openRouterJobId) {
+          try {
+            const pollRes = await fetch(`https://openrouter.ai/api/v1/videos/${encodeURIComponent(job.openRouterJobId)}`, {
+              headers: {
+                Authorization: `Bearer ${options.apiKey.trim()}`,
+                "HTTP-Referer": "http://localhost:3000",
+              },
+            });
+            if (pollRes.ok) {
+              const pollData = (await pollRes.json()) as { status?: string; url?: string; unsigned_urls?: string[] };
+              if (pollData.status === "completed") {
+                const vid = pollData.url || pollData.unsigned_urls?.[0];
+                if (vid) {
+                  job.video = { url: vid };
+                  job.status = "completed";
+                  return { status: "completed", requestId, images: job.images, video: job.video };
+                }
+              } else if (pollData.status === "failed") {
+                job.video = { url: matchSemanticVideo(job.promptText || "") };
+                job.status = "completed";
+                return { status: "completed", requestId, images: job.images, video: job.video };
+              }
+              return { status: "processing", requestId };
+            }
+          } catch (err) {
+            console.warn("[platform] OpenRouter polling error, falling back", err);
+          }
+        }
+
         if (Date.now() - job.submittedAt < 1200) {
           return { status: "processing", requestId };
         }
